@@ -9,6 +9,8 @@ import { prisma } from "@/lib/prisma";
 
 import { ollamaClient } from "@/lib/ollama";
 
+import { verifyToken } from "@/lib/auth";
+
 // ✅ SUCCESS RESPONSE
 export interface GenerateSuccessResponse {
   success: true;
@@ -35,6 +37,27 @@ export interface GenerateErrorResponse {
 
 export async function POST(req: Request) {
   try {
+    // AUTHENTICATION
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized: Missing token" },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.split(" ")[1];
+    const payload = await verifyToken(token);
+    
+    if (!payload) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized: Invalid or expired token" },
+        { status: 401 }
+      );
+    }
+
+    const userId = payload.userId;
+
     // REQUEST BODY
     const { topic, tone, length } =
       await req.json();
@@ -96,6 +119,8 @@ Keep it engaging and under ${wordLimit} words.
               "short",
           }
         ),
+      
+      userId,
     },
   });
 

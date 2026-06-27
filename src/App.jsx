@@ -4,12 +4,12 @@ import BlogGenerator from "./components/BlogGenerator";
 import LoginPage from "./pages/Login";
 import SignupPage from "./pages/Signup";
 
-export default function App() {
-  // Simple check for mock authentication
-  const isAuthenticated = () => {
-    return !!localStorage.getItem("accessToken");
-  };
+const ProtectedRoute = ({ children }) => {
+  const isAuthenticated = !!localStorage.getItem("accessToken");
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
 
+export default function App() {
   return (
     <BrowserRouter>
       <Routes>
@@ -17,7 +17,11 @@ export default function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route 
           path="/" 
-          element={isAuthenticated() ? <BlogGenerator /> : <Navigate to="/login" replace />} 
+          element={
+            <ProtectedRoute>
+              <BlogGenerator />
+            </ProtectedRoute>
+          } 
         />
       </Routes>
     </BrowserRouter>

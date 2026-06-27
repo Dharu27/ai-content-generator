@@ -75,10 +75,8 @@ export default function LoginPage() {
 
       showSuccess("Welcome back! Login successful.");
       
-      // Redirect to Dashboard
-      setTimeout(() => {
-        navigate("/");
-      }, 1000);
+      // Redirect to Dashboard (Blog Generator) instantly
+      navigate("/");
       
     } catch (err) {
       setError(handleAuthError(err));

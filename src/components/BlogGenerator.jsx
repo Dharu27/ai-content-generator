@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   FileText,
@@ -129,6 +130,7 @@ function GeneratedPost({ content }) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function BlogGenerator() {
+  const navigate = useNavigate();
   const [topic, setTopic] = useState("");
   const [tone, setTone] = useState("");
   const [length, setLength] = useState("");
@@ -137,6 +139,17 @@ export default function BlogGenerator() {
   const [dots, setDots] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [error, setError] = useState("");
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      localStorage.removeItem("accessToken");
+      navigate("/login");
+    }
+  };
 
   const handleGenerate = async () => {
     if (!topic.trim()) return;
@@ -232,6 +245,12 @@ Format with a clear title using # Title, then 3–4 sections each with ## Sectio
               </p>
             </div>
           </div>
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200"
+          >
+            Logout
+          </button>
         </header>
 
         {/* Content area */}
